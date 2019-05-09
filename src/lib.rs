@@ -97,14 +97,13 @@ pub fn parse(headers: &HeaderMap) -> Result<Encoding> {
                     if v.len() > 1 {
                         let qval = match v[1].parse::<f32>() {
                             Ok(f) => f,
-                            Err(_) => continue, // skip malformed q values
+                            Err(_) => return Err(ErrorKind::InvalidEncoding)?,
                         };
                         if (qval - 1.0f32).abs() < 0.01 {
                             preferred_encoding = encoding;
                             break;
                         } else if qval > 1.0 {
-                            // q-values over 1 are unacceptable
-                            continue;
+                            return Err(ErrorKind::InvalidEncoding)?; // q-values over 1 are unacceptable
                         } else if qval > max_qval {
                             preferred_encoding = encoding;
                             max_qval = qval;
