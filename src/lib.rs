@@ -70,8 +70,8 @@ impl Encoding {
     ///
     /// Note that [`Encoding::None`] will return a HeaderValue with the content `*`.
     /// This is likely not what you want if you are using this to generate the `Content-Encoding` header to be included in an encoded response.
-    pub fn to_header_value(&self) -> HeaderValue {
-        match *self {
+    pub fn to_header_value(self) -> HeaderValue {
+        match self {
             Encoding::Gzip => HeaderValue::from_str("gzip").unwrap(),
             Encoding::Deflate => HeaderValue::from_str("deflate").unwrap(),
             Encoding::Brotli => HeaderValue::from_str("br").unwrap(),
