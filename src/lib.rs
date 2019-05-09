@@ -39,7 +39,7 @@ use failure::ResultExt;
 use http::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 
 /// Encoding levels.
-#[derive(Debug, Clone, is_enum_variant)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, is_enum_variant)]
 pub enum Encoding {
     /// Gzip is the most preferred encoding present.
     Gzip,
