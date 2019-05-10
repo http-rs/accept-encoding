@@ -89,13 +89,13 @@ pub fn parse(headers: &HeaderMap) -> Result<Encoding> {
     for header_value in headers.get_all(ACCEPT_ENCODING).iter() {
         let header_value = header_value.to_str().context(ErrorKind::InvalidEncoding)?;
         for v in header_value.split(',').map(str::trim) {
-            let v: Vec<&str> = v.splitn(2, ";q=").collect();
-            let encoding = v[0];
+            let mut v = v.splitn(2, ";q=");
+            let encoding = v.next().unwrap();
 
             match Encoding::parse(encoding) {
                 Ok(encoding) => {
-                    if v.len() > 1 {
-                        let qval = match v[1].parse::<f32>() {
+                    if let Some(qval) = v.next() {
+                        let qval = match qval.parse::<f32>() {
                             Ok(f) => f,
                             Err(_) => return Err(ErrorKind::InvalidEncoding)?,
                         };
