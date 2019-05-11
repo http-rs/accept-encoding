@@ -74,7 +74,40 @@ fn multiple_encodings_with_qval_3() -> Result<(), Error> {
     );
 
     let encoding = accept_encoding::parse(&headers)?;
-    assert!(encoding.is_none());
+    assert!(encoding.is_any());
 
+    Ok(())
+}
+
+#[test]
+fn list_encodings() -> Result<(), Error> {
+    use accept_encoding::Encoding;
+
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        ACCEPT_ENCODING,
+        HeaderValue::from_str("zstd;q=1.0, deflate;q=0.8, br;q=0.9")?,
+    );
+
+    let encodings = accept_encoding::encodings(&headers)?;
+    assert_eq!(encodings[0], (Encoding::Zstd, 1.0));
+    assert_eq!(encodings[1], (Encoding::Deflate, 0.8));
+    assert_eq!(encodings[2], (Encoding::Brotli, 0.9));
+    Ok(())
+}
+
+#[test]
+fn list_encodings_ignore_unknown() -> Result<(), Error> {
+    use accept_encoding::Encoding;
+
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        ACCEPT_ENCODING,
+        HeaderValue::from_str("zstd;q=1.0, unknown;q=0.8, br;q=0.9")?,
+    );
+
+    let encodings = accept_encoding::encodings(&headers)?;
+    assert_eq!(encodings[0], (Encoding::Zstd, 1.0));
+    assert_eq!(encodings[1], (Encoding::Brotli, 0.9));
     Ok(())
 }
