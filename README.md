@@ -11,6 +11,7 @@ Determine the best encoding possible from an Accept-Encoding HTTP header.
 ## Examples
 __Basic usage__
 ```rust
+use accept_encoding::Encoding;
 use failure::Error;
 use http::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 
@@ -19,7 +20,7 @@ fn main () -> Result<(), failure::Error> {
   headers.insert(ACCEPT_ENCODING, HeaderValue::from_str("gzip, deflate, br")?);
 
   let encoding = accept_encoding::parse(&headers)?;
-  assert!(encoding.is_brotli());
+  assert_eq!(encoding, Some(Encoding::Gzip));
   Ok(())
 }
 ```
