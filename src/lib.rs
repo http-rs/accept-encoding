@@ -7,6 +7,7 @@
 //! ## Examples
 //! ```rust
 //! # use failure::Error;
+//! use accept_encoding::Encoding;
 //! use http::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 //!
 //! # fn main () -> Result<(), failure::Error> {
@@ -14,12 +15,13 @@
 //! headers.insert(ACCEPT_ENCODING, HeaderValue::from_str("gzip, deflate, br")?);
 //!
 //! let encoding = accept_encoding::parse(&headers)?;
-//! assert!(encoding.is_gzip());
+//! assert_eq!(encoding, Some(Encoding::Gzip));
 //! # Ok(())}
 //! ```
 //!
 //! ```rust
 //! # use failure::Error;
+//! use accept_encoding::Encoding;
 //! use http::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 //!
 //! # fn main () -> Result<(), failure::Error> {
@@ -27,52 +29,46 @@
 //! headers.insert(ACCEPT_ENCODING, HeaderValue::from_str("gzip;q=0.5, deflate;q=0.9, br;q=1.0")?);
 //!
 //! let encoding = accept_encoding::parse(&headers)?;
-//! assert!(encoding.is_brotli());
+//! assert_eq!(encoding, Some(Encoding::Brotli));
 //! # Ok(())}
 //! ```
 
 mod error;
 
 pub use crate::error::{Error, ErrorKind, Result};
-use derive_is_enum_variant::is_enum_variant;
 use failure::ResultExt;
 use http::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 
 /// Encoding levels.
-#[derive(Debug, Clone, Copy, Eq, PartialEq, is_enum_variant)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Encoding {
-    /// Gzip is the most preferred encoding.
+    /// The Gzip encoding.
     Gzip,
-    /// Deflate is the most preferred encoding.
+    /// The Deflate encoding.
     Deflate,
-    /// Brotli is the most preferred encoding.
+    /// The Brotli encoding.
     Brotli,
-    /// Zstd is the most preferred encoding.
+    /// The Zstd encoding.
     Zstd,
-    /// No encoding is preferred.
+    /// No encoding.
     Identity,
-    /// No preference is expressed on which encoding to use. Either the `Accept-Encoding` header is not present, or `*` is set as the most preferred encoding.
-    Any,
 }
 
 impl Encoding {
     /// Parses a given string into its corresponding encoding.
-    fn parse(s: &str) -> Result<Encoding> {
+    fn parse(s: &str) -> Result<Option<Encoding>> {
         match s {
-            "gzip" => Ok(Encoding::Gzip),
-            "deflate" => Ok(Encoding::Deflate),
-            "br" => Ok(Encoding::Brotli),
-            "zstd" => Ok(Encoding::Zstd),
-            "identity" => Ok(Encoding::Identity),
-            "*" => Ok(Encoding::Any),
+            "gzip" => Ok(Some(Encoding::Gzip)),
+            "deflate" => Ok(Some(Encoding::Deflate)),
+            "br" => Ok(Some(Encoding::Brotli)),
+            "zstd" => Ok(Some(Encoding::Zstd)),
+            "identity" => Ok(Some(Encoding::Identity)),
+            "*" => Ok(None),
             _ => Err(ErrorKind::UnknownEncoding)?,
         }
     }
 
     /// Converts the encoding into its' corresponding header value.
-    ///
-    /// Note that [`Encoding::Any`] will return a HeaderValue with the content `*`.
-    /// This is likely not what you want if you are using this to generate the `Content-Encoding` header to be included in an encoded response.
     pub fn to_header_value(self) -> HeaderValue {
         match self {
             Encoding::Gzip => HeaderValue::from_str("gzip").unwrap(),
@@ -80,16 +76,18 @@ impl Encoding {
             Encoding::Brotli => HeaderValue::from_str("br").unwrap(),
             Encoding::Zstd => HeaderValue::from_str("zstd").unwrap(),
             Encoding::Identity => HeaderValue::from_str("identity").unwrap(),
-            Encoding::Any => HeaderValue::from_str("*").unwrap(),
         }
     }
 }
 
-/// Parse a set of HTTP headers into a single `Encoding` that the client prefers.
+/// Parse a set of HTTP headers into a single option yielding an `Encoding` that the client prefers.
 ///
 /// If you're looking for an easy way to determine the best encoding for the client and support every [`Encoding`] listed, this is likely what you want.
-pub fn parse(headers: &HeaderMap) -> Result<Encoding> {
-    let mut preferred_encoding = Encoding::Any;
+///
+/// Note that a result of `None` indicates there preference is expressed on which encoding to use.
+/// Either the `Accept-Encoding` header is not present, or `*` is set as the most preferred encoding.
+pub fn parse(headers: &HeaderMap) -> Result<Option<Encoding>> {
+    let mut preferred_encoding = None;
     let mut max_qval = 0.0;
 
     for (encoding, qval) in encodings(headers)? {
@@ -105,9 +103,12 @@ pub fn parse(headers: &HeaderMap) -> Result<Encoding> {
     Ok(preferred_encoding)
 }
 
-/// Parse a set of HTTP headers into a vector containing tuples of encodings and their corresponding q-values.
+/// Parse a set of HTTP headers into a vector containing tuples of options containing encodings and their corresponding q-values.
 ///
 /// If you're looking for more fine-grained control over what encoding to choose for the client, or if you don't support every [`Encoding`] listed, this is likely what you want.
+///
+/// Note that a result of `None` indicates there preference is expressed on which encoding to use.
+/// Either the `Accept-Encoding` header is not present, or `*` is set as the most preferred encoding.
 /// ## Example
 /// ```rust
 /// # use failure::Error;
@@ -124,7 +125,7 @@ pub fn parse(headers: &HeaderMap) -> Result<Encoding> {
 /// }
 /// # Ok(())}
 /// ```
-pub fn encodings(headers: &HeaderMap) -> Result<Vec<(Encoding, f32)>> {
+pub fn encodings(headers: &HeaderMap) -> Result<Vec<(Option<Encoding>, f32)>> {
     headers
         .get_all(ACCEPT_ENCODING)
         .iter()
@@ -157,5 +158,5 @@ pub fn encodings(headers: &HeaderMap) -> Result<Vec<(Encoding, f32)>> {
             Some(Ok((encoding, qval)))
         })
         .map(|v| v.map_err(std::convert::Into::into))
-        .collect::<Result<Vec<(Encoding, f32)>>>()
+        .collect::<Result<Vec<(Option<Encoding>, f32)>>>()
 }
