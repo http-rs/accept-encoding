@@ -10,7 +10,7 @@ fn single_encoding() -> Result<(), Error> {
     let mut headers = HeaderMap::new();
     headers.insert(ACCEPT_ENCODING, HeaderValue::from_str("gzip")?);
 
-    let encoding = accept_encoding::parse(&headers)?.expect("Something went wrong");
+    let encoding = accept_encoding::parse(&headers)?.unwrap();
     assert_eq!(encoding, Encoding::Gzip);
 
     Ok(())
@@ -21,7 +21,7 @@ fn multiple_encodings() -> Result<(), Error> {
     let mut headers = HeaderMap::new();
     headers.insert(ACCEPT_ENCODING, HeaderValue::from_str("gzip, deflate, br")?);
 
-    let encoding = accept_encoding::parse(&headers)?.expect("Something went wrong");
+    let encoding = accept_encoding::parse(&headers)?.unwrap();
     assert_eq!(encoding, Encoding::Gzip);
 
     Ok(())
@@ -32,7 +32,7 @@ fn single_encoding_with_qval() -> Result<(), Error> {
     let mut headers = HeaderMap::new();
     headers.insert(ACCEPT_ENCODING, HeaderValue::from_str("deflate;q=1.0")?);
 
-    let encoding = accept_encoding::parse(&headers)?.expect("Something went wrong");
+    let encoding = accept_encoding::parse(&headers)?.unwrap();
     assert_eq!(encoding, Encoding::Deflate);
 
     Ok(())
@@ -46,7 +46,7 @@ fn multiple_encodings_with_qval_1() -> Result<(), Error> {
         HeaderValue::from_str("deflate, gzip;q=1.0, *;q=0.5")?,
     );
 
-    let encoding = accept_encoding::parse(&headers)?.expect("Something went wrong");
+    let encoding = accept_encoding::parse(&headers)?.unwrap();
     assert_eq!(encoding, Encoding::Deflate);
 
     Ok(())
@@ -60,7 +60,7 @@ fn multiple_encodings_with_qval_2() -> Result<(), Error> {
         HeaderValue::from_str("gzip;q=0.5, deflate;q=1.0, *;q=0.5")?,
     );
 
-    let encoding = accept_encoding::parse(&headers)?.expect("Something went wrong");
+    let encoding = accept_encoding::parse(&headers)?.unwrap();
     assert_eq!(encoding, Encoding::Deflate);
 
     Ok(())

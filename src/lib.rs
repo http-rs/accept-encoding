@@ -109,7 +109,7 @@ pub fn parse(headers: &HeaderMap) -> Result<Option<Encoding>> {
 ///
 /// Note that a result of `None` indicates there preference is expressed on which encoding to use.
 /// Either the `Accept-Encoding` header is not present, or `*` is set as the most preferred encoding.
-/// ## Example
+/// ## Examples
 /// ```rust
 /// # use failure::Error;
 /// use accept_encoding::Encoding;
