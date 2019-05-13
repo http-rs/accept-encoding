@@ -1,8 +1,8 @@
 extern crate accept_encoding;
 extern crate failure;
 
-use failure::Error;
 use accept_encoding::Encoding;
+use failure::Error;
 use http::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 
 #[test]
