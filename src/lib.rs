@@ -39,7 +39,7 @@ pub use crate::error::{Error, ErrorKind, Result};
 use failure::ResultExt;
 use http::header::{HeaderMap, HeaderValue, ACCEPT_ENCODING};
 
-/// Encoding levels.
+/// Encodings to use.
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum Encoding {
     /// The Gzip encoding.
