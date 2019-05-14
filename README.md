@@ -49,14 +49,14 @@ None.
 
 [1]: https://img.shields.io/crates/v/accept-encoding.svg?style=flat-square
 [2]: https://crates.io/crates/accept-encoding
-[3]: https://img.shields.io/travis/rust-net-web/accept-encoding/master.svg?style=flat-square
-[4]: https://travis-ci.org/rust-net-web/accept-encoding
+[3]: https://img.shields.io/travis/rustasync/accept-encoding/master.svg?style=flat-square
+[4]: https://travis-ci.org/rustasync/accept-encoding
 [5]: https://img.shields.io/crates/d/accept-encoding.svg?style=flat-square
 [6]: https://crates.io/crates/accept-encoding
 [7]: https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square
 [8]: https://docs.rs/accept-encoding
 
-[releases]: https://github.com/rust-net-web/accept-encoding/releases
-[contributing]: https://github.com/rust-net-web/accept-encoding/blob/master.github/CONTRIBUTING.md
-[good-first-issue]: https://github.com/rust-net-web/accept-encoding/labels/good%20first%20issue
-[help-wanted]: https://github.com/rust-net-web/accept-encoding/labels/help%20wanted
+[releases]: https://github.com/rustasync/accept-encoding/releases
+[contributing]: https://github.com/rustasync/accept-encoding/blob/master.github/CONTRIBUTING.md
+[good-first-issue]: https://github.com/rustasync/accept-encoding/labels/good%20first%20issue
+[help-wanted]: https://github.com/rustasync/accept-encoding/labels/help%20wanted
