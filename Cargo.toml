@@ -1,6 +1,6 @@
 [package]
 name = "accept-encoding"
-version = "0.2.0-alpha.1"
+version = "0.2.0-alpha.2"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/rust-net-web/accept-encoding"
 documentation = "https://docs.rs/accept-encoding"
