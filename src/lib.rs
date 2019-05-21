@@ -132,7 +132,7 @@ pub fn encodings(headers: &HeaderMap) -> Result<Vec<(Option<Encoding>, f32)>> {
         .map(|hval| {
             hval.to_str()
                 .context(ErrorKind::InvalidEncoding)
-                .map_err(std::convert::Into::into)
+                .map_err(Into::into)
         })
         .collect::<Result<Vec<&str>>>()?
         .iter()
